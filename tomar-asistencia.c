@@ -19,8 +19,8 @@ typedef struct {
 void welcome();
 int readNStudents();
 void readStudentsData(int n_students);
-TNode *createNode(TStudent student);
 TNode *insertStart(TNode *head, TStudent student);
+TNode *createNode(TStudent student);
 void printMenu();
 
 void takeAttendance(TNode *head);
