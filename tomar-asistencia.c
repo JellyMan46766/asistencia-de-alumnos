@@ -29,11 +29,11 @@ TNode *createNode(TStudent student, char current_student_name[]);
 void printMenu(TNode *head);
 void callFunctions(int option, int *current_day, TNode *head,
                    int *attendance_taken);
-
 void takeAttendance(TNode *head, int current_day);
 void printDayAttendance(TNode *head, int current_day);
 void printWeekAttendance(TNode *head, int *attendance_taken, int current_day);
 void advanceDay();
+void waitInput();
 
 int main()
 {
@@ -48,12 +48,10 @@ int main()
 void welcome()
 {
   system("clear");
-  printf("X------------------------------------------------X\n");
-  printf("Bienvenido al programa de\ntoma de asistencia de alumnos.\n");
-  char buffer;
-  printf("Presiona N.\n> ");
-  scanf(" %c", &buffer);
-  printf("X------------------------------------------------X\n");
+  printf("X-------------------------------------------------------X\n");
+  printf("Bienvenido al programa de toma de asistencia de alumnos.\n");
+  printf("X-------------------------------------------------------X\n");
+  waitInput();
   system("clear");
 }
 
@@ -80,6 +78,7 @@ void readStudentsData(int n_students)
     printf("Ingresa el nombre del estudiante #%d: ", i + OFFSET);
     scanf(" %[^\n]", current_student_name);
     head = insertStart(head, current_student, current_student_name);
+    printf("\n");
   }
   printMenu(head);
 }
@@ -125,6 +124,7 @@ void printMenu(TNode *head)
     return;
   }
   do {
+    system("clear");
     printf("X------------------------------------------------X\n");
     printf("Dia: %d\n\n", current_day);
     printf("Elige una opcion:\n");
@@ -142,6 +142,7 @@ void printMenu(TNode *head)
       for (int i = 1; i <= WEEK_DAYS; i++) {
         *(attendance_taken + i) = 0;
       }
+      waitInput();
     }
   } while (option != 5);
 }
@@ -152,23 +153,31 @@ void callFunctions(int option, int *current_day, TNode *head,
   switch (option) {
   case TAKE_ATTENDANCE:
     if (*(attendance_taken + *current_day) == 1) {
+      system("clear");
+      printf("X------------------------------------------------X\n");
       printf("Ya se tomo asistencia hoy\n");
+      waitInput();
     }
     else {
       *(attendance_taken + *current_day) = 1;
       takeAttendance(head, *current_day);
+      waitInput();
     }
     break;
   case SHOW_DAY_ATTENDANCE:
     if (*(attendance_taken + *current_day) == 1) {
       printDayAttendance(head, *current_day);
+      waitInput();
     }
     else {
+      system("clear");
       printf("No se ha tomado asistencia hoy\n");
+      waitInput();
     }
     break;
   case SHOW_WEEK_ATTENDANCE:
     printWeekAttendance(head, attendance_taken, *current_day);
+    waitInput();
     break;
   case ADVANCE_DAY:
     (*current_day)++;
@@ -176,6 +185,7 @@ void callFunctions(int option, int *current_day, TNode *head,
   case QUIT:
     return;
   default:
+    system("clear");
     printf("Opcion no valida\n");
     break;
   }
@@ -185,6 +195,7 @@ void takeAttendance(TNode *head, int current_day)
 {
   TNode *current_student = head;
   int student_attended;
+  system("clear");
   printf("X------------------------------------------------X\n");
   printf("Tomar asistencia de hoy:\n");
   printf("Asistio: 1, No asistio: 0\n");
@@ -200,6 +211,7 @@ void takeAttendance(TNode *head, int current_day)
 void printDayAttendance(TNode *head, int current_day)
 {
   TNode *current_student = head;
+  system("clear");
   printf("X------------------------------------------------X\n");
   printf("Asistencia de hoy:\n\n");
   while (current_student != NULL) {
@@ -217,6 +229,7 @@ void printDayAttendance(TNode *head, int current_day)
 
 void printWeekAttendance(TNode *head, int *attendance_taken, int current_day)
 {
+  system("clear");
   printf("X------------------------------------------------X\n");
   printf("Asistencia de la semana:\n\n");
   for (int i = 1; i <= current_day; i++) {
@@ -242,4 +255,11 @@ void printWeekAttendance(TNode *head, int *attendance_taken, int current_day)
     }
     printf("\n");
   }
+}
+
+void waitInput()
+{
+  char buffer;
+  printf("Presiona 'n' para continuar.\n> ");
+  scanf(" %c", &buffer);
 }
