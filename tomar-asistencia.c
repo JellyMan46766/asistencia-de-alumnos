@@ -37,7 +37,6 @@ void printWeekAttendance(TNode *head, int *attendance_taken, int current_day);
 void deleteStudent(TNode **head, int *n_students);
 void sortAlphabetically(TNode **head, int n_students);
 void waitInput();
-void showStudents(TNode *head);
 
 int main()
 {
