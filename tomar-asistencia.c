@@ -228,13 +228,13 @@ void printDayAttendance(TNode *head, int current_day)
   printf("X------------------------------------------------X\n");
   printf("Asistencia de hoy:\n\n");
   while (current_student != NULL) {
-    printf("%s, %d: ", current_student->student.name,
+    printf("%s, %d:", current_student->student.name,
            current_student->student.id);
     if (*(current_student->student.attendance + current_day) == 1) {
-      printf("Asistio\n");
+      printf("\tAsistio\n");
     }
     else {
-      printf("No asistio\n");
+      printf("\tNo asistio\n");
     }
     current_student = current_student->next;
   }
@@ -250,14 +250,14 @@ void printWeekAttendance(TNode *head, int *attendance_taken, int current_day)
     if (*(attendance_taken + i) == 1) {
       TNode *current_student = head;
       while (current_student != NULL) {
-        printf("%s, %d: ", current_student->student.name,
+        printf("%s, %d:", current_student->student.name,
                current_student->student.id);
         int *current_attendance = current_student->student.attendance + i;
         if (*current_attendance == 1) {
-          printf("Asistio\n");
+          printf("\tAsistio\n");
         }
         else {
-          printf("No asistio\n");
+          printf("\tNo asistio\n");
         }
         current_student = current_student->next;
       }
