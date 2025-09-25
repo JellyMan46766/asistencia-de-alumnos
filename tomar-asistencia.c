@@ -7,8 +7,10 @@
 #define TAKE_ATTENDANCE 1
 #define SHOW_DAY_ATTENDANCE 2
 #define SHOW_WEEK_ATTENDANCE 3
-#define ADVANCE_DAY 4
-#define QUIT 5
+#define DELETE_STUDENT 4
+#define SORT_APLHA 5
+#define ADVANCE_DAY 6
+#define QUIT 7
 
 typedef struct {
   int *attendance; // 1 - present, 0 - not present
@@ -26,14 +28,16 @@ int readNStudents();
 void readStudentsData(int n_students);
 TNode *insertStart(TNode *head, TStudent student, char current_student_name[]);
 TNode *createNode(TStudent student, char current_student_name[]);
-void printMenu(TNode *head);
-void callFunctions(int option, int *current_day, TNode *head,
-                   int *attendance_taken);
+void printMenu(TNode *head, int n_students);
+void callFunctions(int option, int *current_day, TNode **head,
+                   int *attendance_taken, int n_students);
 void takeAttendance(TNode *head, int current_day);
 void printDayAttendance(TNode *head, int current_day);
 void printWeekAttendance(TNode *head, int *attendance_taken, int current_day);
-void advanceDay();
+void deleteStudent(TNode **head, int *n_students);
+void sortAlphabetically(TNode **head, int n_students);
 void waitInput();
+void showStudents(TNode *head);
 
 int main()
 {
@@ -80,7 +84,7 @@ void readStudentsData(int n_students)
     head = insertStart(head, current_student, current_student_name);
     printf("\n");
   }
-  printMenu(head);
+  printMenu(head, n_students);
 }
 
 TNode *insertStart(TNode *head, TStudent current_student,
@@ -114,7 +118,7 @@ TNode *createNode(TStudent current_student, char current_student_name[])
   return new;
 }
 
-void printMenu(TNode *head)
+void printMenu(TNode *head, int n_students)
 {
   int option, current_day = 1;
   int *attendance_taken;
@@ -131,11 +135,13 @@ void printMenu(TNode *head)
     printf("1. Tomar lista\n");
     printf("2. Mostrar asistencia del dia\n");
     printf("3. Mostrar asistencia de la semana\n");
-    printf("4. Avanzar dia\n");
-    printf("5. Salir\n");
+    printf("4. Eliminar alumno por id\n");
+    printf("5. Ordernar alumnos alfabeticamente\n");
+    printf("6. Avanzar dia\n");
+    printf("7. Salir\n");
     printf("X------------------------------------------------X\n> ");
     scanf("%d", &option);
-    callFunctions(option, &current_day, head, attendance_taken);
+    callFunctions(option, &current_day, &head, attendance_taken, n_students);
     if (current_day == 6) {
       printf("Nueva semana\n");
       current_day = 1;
@@ -144,11 +150,11 @@ void printMenu(TNode *head)
       }
       waitInput();
     }
-  } while (option != 5);
+  } while (option != 7);
 }
 
-void callFunctions(int option, int *current_day, TNode *head,
-                   int *attendance_taken)
+void callFunctions(int option, int *current_day, TNode **head,
+                   int *attendance_taken, int n_students)
 {
   switch (option) {
   case TAKE_ATTENDANCE:
@@ -160,13 +166,13 @@ void callFunctions(int option, int *current_day, TNode *head,
     }
     else {
       *(attendance_taken + *current_day) = 1;
-      takeAttendance(head, *current_day);
+      takeAttendance(*head, *current_day);
       waitInput();
     }
     break;
   case SHOW_DAY_ATTENDANCE:
     if (*(attendance_taken + *current_day) == 1) {
-      printDayAttendance(head, *current_day);
+      printDayAttendance(*head, *current_day);
       waitInput();
     }
     else {
@@ -176,7 +182,15 @@ void callFunctions(int option, int *current_day, TNode *head,
     }
     break;
   case SHOW_WEEK_ATTENDANCE:
-    printWeekAttendance(head, attendance_taken, *current_day);
+    printWeekAttendance(*head, attendance_taken, *current_day);
+    waitInput();
+    break;
+  case DELETE_STUDENT:
+    deleteStudent(head, &n_students); // en realidad -> &*head
+    waitInput();
+    break;
+  case SORT_APLHA:
+    sortAlphabetically(head, n_students);
     waitInput();
     break;
   case ADVANCE_DAY:
@@ -255,6 +269,71 @@ void printWeekAttendance(TNode *head, int *attendance_taken, int current_day)
     }
     printf("\n");
   }
+}
+
+void deleteStudent(TNode **head, int *n_students)
+{
+  system("clear");
+  printf("X------------------------------------------------X\n");
+  int searched_id;
+  printf("Ingresa el id del estudiante a eliminar: ");
+  scanf("%d", &searched_id);
+  TNode *current_student = *head;
+  while (current_student->next != NULL) {
+    if (current_student->student.id == searched_id) {
+      *head = current_student->next;
+      free(current_student->student.attendance);
+      free(current_student->student.name);
+      free(current_student);
+      (*n_students)--;
+      printf("Estudiante eliminado de la lista\n");
+      return;
+    }
+    if (current_student->next->student.id == searched_id) {
+      TNode *temp = current_student->next;
+      current_student->next = temp->next;
+      free(temp->student.attendance);
+      free(temp->student.name);
+      free(temp);
+      (*n_students)--;
+      printf("Estudiante eliminado de la lista\n");
+      return;
+    }
+    current_student = current_student->next;
+  }
+  printf("No se encontro ningun estudiante con ese id\n");
+}
+
+void sortAlphabetically(TNode **head, int n_students)
+{
+  system("clear");
+  TNode *current_student;
+  for (int i = 0; i < n_students; i++) {
+    current_student = *head;
+    while (current_student->next->next != NULL) {
+      // Si es el primero en la lista
+      if (strcmp(current_student->next->student.name,
+                 current_student->student.name) < 0) {
+        TNode *temp;
+        temp = current_student->next;
+        current_student->next = current_student->next->next;
+        temp->next = current_student;
+        *head = temp;
+      }
+      if (strcmp(current_student->next->next->student.name,
+                 current_student->next->student.name) < 0) {
+        TNode *temp;
+        TNode *temp2;
+        temp = current_student->next;
+        current_student->next = current_student->next->next;
+        temp2 = current_student->next->next;
+        current_student->next->next = temp;
+        temp->next = temp2;
+      }
+      current_student = current_student->next;
+    }
+  }
+  printf("Alumnos ordenados alfabeticamente\n");
 }
 
 void waitInput()
